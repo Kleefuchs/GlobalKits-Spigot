@@ -23,6 +23,13 @@ public class PluginConfiguration {
         return this.worldNames;
     }
 
+    public boolean isWorldEnabled(String world) throws NullPointerException {
+        if (this.worldNames == null) {
+            throw new NullPointerException("World names are null may need to call readConfig()");
+        }
+        return this.worldNames.contains(world);
+    }
+
     public PluginConfiguration(YamlConfiguration config) {
         this.config = config;
     }

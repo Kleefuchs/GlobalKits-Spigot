@@ -1,12 +1,15 @@
 package dev.kleefuchs.globalkits;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.kleefuchs.globalkits.commands.LoadKitCommand;
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
 
 public class GlobalKitsPlugin extends JavaPlugin {
@@ -30,6 +33,14 @@ public class GlobalKitsPlugin extends JavaPlugin {
         this.cfg.readConfig();
     }
 
+    private void initCommands() {
+        HashMap<String, CommandExecutor> commandExecutors = new HashMap<String, CommandExecutor>();
+        commandExecutors.put("loadkit", new LoadKitCommand(this.cfg));
+        commandExecutors.forEach((name, commandExecutor) -> {
+            this.getCommand(name).setExecutor(commandExecutor);
+        });
+    }
+
     public void init() {
         instance = this;
         try {
@@ -41,6 +52,7 @@ public class GlobalKitsPlugin extends JavaPlugin {
             Bukkit.getLogger().log(Level.SEVERE, "Invalid config.yml");
             e.printStackTrace();
         }
+        this.initCommands();
     }
 
     @Override
