@@ -7,6 +7,8 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.kleefuchs.globalkits.config.PluginConfiguration;
+
 public class GlobalKitsPlugin extends JavaPlugin {
 
     private static GlobalKitsPlugin instance;
@@ -15,14 +17,42 @@ public class GlobalKitsPlugin extends JavaPlugin {
         return instance;
     }
 
+    private PluginConfiguration cfg;
+
+    public PluginConfiguration getCFG() {
+        return cfg;
+    }
+
+    private void initCFG(String path) throws IOException, InvalidConfigurationException {
+        YamlConfiguration ymlcfg = new YamlConfiguration();
+        ymlcfg.load(path);
+        this.cfg = new PluginConfiguration(ymlcfg);
+        this.cfg.readConfig();
+    }
+
     public void init() {
         instance = this;
+        try {
+            this.initCFG("plugins/GlobalKits/config.yml");
+        } catch (IOException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Could not load config.yml");
+            e.printStackTrace();
+        } catch (InvalidConfigurationException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "Invalid config.yml");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        init();
+        this.init();
+        Bukkit.getLogger().info("GlobalKits plugin enabled");
+        Bukkit.getLogger().info("GlobalKits version: " + this.getDescription().getVersion());
+        Bukkit.getLogger().info("The following Worlds are enabled:");
+        for (String world : this.cfg.getWorldNames()) {
+            Bukkit.getLogger().info("World: " + world);
+        }
     }
 
     @Override
