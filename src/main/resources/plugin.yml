@@ -1,0 +1,5 @@
+name: GlobalKits # The name of your plugin
+author: "Kleefuchs" # Your username.
+main: dev.kleefuchs.globalkits.GlobalKits # Replace "me.mfnalex" with the Group ID you chose, and adjust "helloworldplugin.HelloWorldPlugin" if you chose another plugin name.
+version: ${project.version} # Maven will automatically replace this with the version number defined in your pom.xml
+api-version: "1.13" # Optional, but you should add this when your plugin should run on ANY versions above 1.13
