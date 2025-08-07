@@ -7,9 +7,13 @@ api-version: "1.13" # Optional, but you should add this when your plugin should 
 commands:
   loadkit:
     description: Used to load a kit
-    usage: /loadkit <Kit-Creator-Name>/<Kit-Name>
+    usage: /loadkit "<Kit-Creator-Name>/<Kit-Name>"
     permission: globalkits.loadkit
   savekit:
     description: Used to save a kit
-    usage: /savekit Kit-Name
+    usage: /savekit "<Kit-Name>"
     permission: globalkits.savekit
+  deletekit:
+    description: Used to delete a kit
+    useage: /savekit "<Kit-Name>"
+    permission: globalkits.deletekit

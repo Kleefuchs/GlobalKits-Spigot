@@ -6,34 +6,28 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
-import dev.kleefuchs.globalkits.kits.Kit;
 import dev.kleefuchs.globalkits.kits.KitManager;
 import dev.kleefuchs.globalkits.utils.GenerateKeyForPlayerKit;
 
-public class SaveKitCommand implements CommandExecutor {
+public class DeleteKitCommand implements CommandExecutor {
 
     PluginConfiguration plcfg;
     KitManager kitManager;
 
-    public SaveKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
+    public DeleteKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
         this.plcfg = plcfg;
         this.kitManager = kitManager;
     }
 
-    // This method is called, when somebody uses our command
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 1) {
             sender.sendMessage("Please specify a kit name!");
             return false;
         }
-        if (!(sender instanceof org.bukkit.entity.Player)) {
-            sender.sendMessage("You can only use this command as a player!");
-            return true;
-        }
         Player player = (Player) sender;
-        if (!player.hasPermission("globalkits.savekit")) {
-            sender.sendMessage("You lack the globalkits.savekit permission");
+        if (!player.hasPermission("globalkits.deletekit")) {
+            sender.sendMessage("You lack the globalkits.loadkit permission");
             return true;
         }
         if (!this.plcfg.isWorldEnabled(player.getWorld().getName())) {
@@ -41,7 +35,11 @@ public class SaveKitCommand implements CommandExecutor {
             return true;
         }
         String key = GenerateKeyForPlayerKit.generate(player.getName(), args[0]);
-        this.kitManager.getKits().put(key.toString(), new Kit(player.getInventory().getContents()));
+        if (!this.kitManager.getKits().containsKey(key)) {
+            sender.sendMessage("There is no such kit");
+            return true;
+        }
+        this.kitManager.getKits().remove(key);
         return true;
     }
 }
