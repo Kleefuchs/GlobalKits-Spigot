@@ -1,4 +1,6 @@
 package dev.kleefuchs.globalkits;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -10,7 +12,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.kleefuchs.globalkits.commands.LoadKitCommand;
+import dev.kleefuchs.globalkits.commands.SaveKitCommand;
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
+import dev.kleefuchs.globalkits.kits.KitManager;
 
 public class GlobalKitsPlugin extends JavaPlugin {
 
@@ -23,19 +27,31 @@ public class GlobalKitsPlugin extends JavaPlugin {
     private PluginConfiguration cfg;
 
     public PluginConfiguration getCFG() {
-        return cfg;
+        return this.cfg;
     }
 
-    private void initCFG(String path) throws IOException, InvalidConfigurationException {
+    KitManager kitManager;
+
+    public KitManager getKitManager() {
+        return this.kitManager;
+    }
+
+    private void initCFG(File file) throws IOException, InvalidConfigurationException {
         YamlConfiguration ymlcfg = new YamlConfiguration();
-        ymlcfg.load(path);
+        ymlcfg.load(file);
         this.cfg = new PluginConfiguration(ymlcfg);
         this.cfg.readConfig();
     }
 
+    private void initKitManager(File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
+        this.kitManager = new KitManager();
+        this.kitManager.loadKits(file);
+    }
+
     private void initCommands() {
         HashMap<String, CommandExecutor> commandExecutors = new HashMap<String, CommandExecutor>();
-        commandExecutors.put("loadkit", new LoadKitCommand(this.cfg));
+        commandExecutors.put("loadkit", new LoadKitCommand(this.cfg, this.kitManager));
+        commandExecutors.put("savekit", new SaveKitCommand(this.cfg, this.kitManager));
         commandExecutors.forEach((name, commandExecutor) -> {
             this.getCommand(name).setExecutor(commandExecutor);
         });
@@ -44,12 +60,22 @@ public class GlobalKitsPlugin extends JavaPlugin {
     public void init() {
         instance = this;
         try {
-            this.initCFG("plugins/GlobalKits/config.yml");
+            this.initCFG(new File("plugins/GlobalKits/config.yml"));
         } catch (IOException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Could not load config.yml");
+            this.getLogger().log(Level.SEVERE, "Could not load config.yml");
             e.printStackTrace();
         } catch (InvalidConfigurationException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Invalid config.yml");
+            this.getLogger().log(Level.SEVERE, "Invalid config.yml");
+            e.printStackTrace();
+        }
+
+        try {
+            this.initKitManager(new File("plugins/GlobalKits/kits.yml"));
+        } catch (IOException e) {
+            this.getLogger().log(Level.SEVERE, "Could not load kits.yml");
+            e.printStackTrace();
+        } catch (InvalidConfigurationException e) {
+            this.getLogger().log(Level.SEVERE, "Invalid kits.yml");
             e.printStackTrace();
         }
         this.initCommands();
@@ -59,17 +85,31 @@ public class GlobalKitsPlugin extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         this.init();
-        Bukkit.getLogger().info("GlobalKits plugin enabled");
-        Bukkit.getLogger().info("GlobalKits version: " + this.getDescription().getVersion());
-        Bukkit.getLogger().info("The following Worlds are enabled:");
+        this.getLogger().info("GlobalKits plugin enabled");
+        this.getLogger().info("GlobalKits version: " + this.getDescription().getVersion());
+        this.getLogger().info("The following Worlds are enabled:");
         for (String world : this.cfg.getWorldNames()) {
-            Bukkit.getLogger().info("World: " + world);
+            this.getLogger().info("World: " + world);
+        }
+    }
+
+    public void deconstruct() throws IOException {
+        try {
+            this.kitManager.saveKits(new File("plugins/GlobalKits/kits.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        try {
+            this.deconstruct();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

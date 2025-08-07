@@ -1,7 +1,7 @@
 name: GlobalKits # The name of your plugin
 author: "Kleefuchs" # Your username.
 main: dev.kleefuchs.globalkits.GlobalKitsPlugin # Replace "me.mfnalex" with the Group ID you chose, and adjust "helloworldplugin.HelloWorldPlugin" if you chose another plugin name.
-version: ${project.version} # Maven will automatically replace this with the version number defined in your pom.xml
+version: "${project.version}" # Maven will automatically replace this with the version number defined in your pom.xml
 api-version: "1.13" # Optional, but you should add this when your plugin should run on ANY versions above 1.13
 
 commands:
@@ -9,3 +9,7 @@ commands:
     description: Used to load a kit
     usage: /loadkit <Kit-Creator-Name>/<Kit-Name>
     permission: globalkits.loadkit
+  savekit:
+    description: Used to save a kit
+    usage: /savekit Kit-Name
+    permission: globalkits.savekit

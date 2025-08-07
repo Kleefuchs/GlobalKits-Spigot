@@ -6,14 +6,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
+import dev.kleefuchs.globalkits.kits.Kit;
 import dev.kleefuchs.globalkits.kits.KitManager;
 
-public class LoadKitCommand implements CommandExecutor {
+public class SaveKitCommand implements CommandExecutor {
 
     PluginConfiguration plcfg;
     KitManager kitManager;
 
-    public LoadKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
+    public SaveKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
         this.plcfg = plcfg;
         this.kitManager = kitManager;
     }
@@ -30,19 +31,19 @@ public class LoadKitCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-        if (!player.hasPermission("globalkits.loadkit")) {
-            sender.sendMessage("You lack the globalkits.loadkit permission");
+        if (!player.hasPermission("globalkits.savekit")) {
+            sender.sendMessage("You lack the globalkits.savekit permission");
             return true;
         }
         if (!this.plcfg.isWorldEnabled(player.getWorld().getName())) {
             sender.sendMessage("This world is not enabled!");
             return true;
         }
-        if (!this.kitManager.getKits().containsKey(args[0])) {
-            sender.sendMessage("There is no such kit");
-            return true;
-        }
-        player.getInventory().setContents(this.kitManager.getKits().get(args[0]).getItems());
+        StringBuilder key = new StringBuilder();
+        key.append(player.getName());
+        key.append('/');
+        key.append(args[0]);
+        this.kitManager.getKits().put(key.toString(), new Kit(player.getInventory().getContents()));
         return true;
     }
 }
