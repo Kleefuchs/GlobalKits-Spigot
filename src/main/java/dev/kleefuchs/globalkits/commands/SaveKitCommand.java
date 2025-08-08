@@ -7,17 +7,17 @@ import org.bukkit.entity.Player;
 
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
 import dev.kleefuchs.globalkits.kits.Kit;
-import dev.kleefuchs.globalkits.kits.KitManager;
-import dev.kleefuchs.globalkits.utils.GenerateKeyForPlayerKit;
+import dev.kleefuchs.globalkits.kits.PlayerKits;
+import dev.kleefuchs.globalkits.kits.PlayerKitsManager;
 
 public class SaveKitCommand implements CommandExecutor {
 
     PluginConfiguration plcfg;
-    KitManager kitManager;
+    PlayerKitsManager playerKitsManager;
 
-    public SaveKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
+    public SaveKitCommand(PluginConfiguration plcfg, PlayerKitsManager playerKitsManager) {
         this.plcfg = plcfg;
-        this.kitManager = kitManager;
+        this.playerKitsManager = playerKitsManager;
     }
 
     // This method is called, when somebody uses our command
@@ -40,8 +40,12 @@ public class SaveKitCommand implements CommandExecutor {
             sender.sendMessage("This world is not enabled!");
             return true;
         }
-        String key = GenerateKeyForPlayerKit.generate(player.getName(), args[0]);
-        this.kitManager.getKits().put(key.toString(), new Kit(player.getInventory().getContents()));
+        if (!this.playerKitsManager.getPlayerKits().containsKey(player.getName())) {
+            this.playerKitsManager.putPlayersKits(player.getName(), new PlayerKits());     //Create Section for Player in playerKitsManager
+        }
+
+        this.playerKitsManager.getPlayersKits(player.getName()).putKit(args[0], new Kit(player.getInventory().getContents()));
+
         return true;
     }
 }

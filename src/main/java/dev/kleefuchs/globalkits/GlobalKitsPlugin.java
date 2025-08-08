@@ -5,16 +5,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.kleefuchs.globalkits.commands.DeleteKitCommand;
 import dev.kleefuchs.globalkits.commands.LoadKitCommand;
 import dev.kleefuchs.globalkits.commands.SaveKitCommand;
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
-import dev.kleefuchs.globalkits.kits.KitManager;
+import dev.kleefuchs.globalkits.kits.PlayerKitsManager;
 
 public class GlobalKitsPlugin extends JavaPlugin {
 
@@ -30,9 +30,9 @@ public class GlobalKitsPlugin extends JavaPlugin {
         return this.cfg;
     }
 
-    KitManager kitManager;
+    PlayerKitsManager kitManager;
 
-    public KitManager getKitManager() {
+    public PlayerKitsManager getKitManager() {
         return this.kitManager;
     }
 
@@ -44,7 +44,7 @@ public class GlobalKitsPlugin extends JavaPlugin {
     }
 
     private void initKitManager(File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
-        this.kitManager = new KitManager();
+        this.kitManager = new PlayerKitsManager();
         this.kitManager.loadKits(file);
     }
 
@@ -52,6 +52,7 @@ public class GlobalKitsPlugin extends JavaPlugin {
         HashMap<String, CommandExecutor> commandExecutors = new HashMap<String, CommandExecutor>();
         commandExecutors.put("loadkit", new LoadKitCommand(this.cfg, this.kitManager));
         commandExecutors.put("savekit", new SaveKitCommand(this.cfg, this.kitManager));
+        commandExecutors.put("deletekit", new DeleteKitCommand(this.cfg, this.kitManager));
         commandExecutors.forEach((name, commandExecutor) -> {
             this.getCommand(name).setExecutor(commandExecutor);
         });

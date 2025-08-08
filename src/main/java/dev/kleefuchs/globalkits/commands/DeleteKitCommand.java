@@ -6,15 +6,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import dev.kleefuchs.globalkits.config.PluginConfiguration;
-import dev.kleefuchs.globalkits.kits.KitManager;
-import dev.kleefuchs.globalkits.utils.GenerateKeyForPlayerKit;
+import dev.kleefuchs.globalkits.kits.PlayerKitsManager;
 
 public class DeleteKitCommand implements CommandExecutor {
 
     PluginConfiguration plcfg;
-    KitManager kitManager;
+    PlayerKitsManager kitManager;
 
-    public DeleteKitCommand(PluginConfiguration plcfg, KitManager kitManager) {
+    public DeleteKitCommand(PluginConfiguration plcfg, PlayerKitsManager kitManager) {
         this.plcfg = plcfg;
         this.kitManager = kitManager;
     }
@@ -27,19 +26,13 @@ public class DeleteKitCommand implements CommandExecutor {
         }
         Player player = (Player) sender;
         if (!player.hasPermission("globalkits.deletekit")) {
-            sender.sendMessage("You lack the globalkits.loadkit permission");
+            sender.sendMessage("You lack the globalkits.deletekit permission");
             return true;
         }
         if (!this.plcfg.isWorldEnabled(player.getWorld().getName())) {
             sender.sendMessage("This world is not enabled!");
             return true;
         }
-        String key = GenerateKeyForPlayerKit.generate(player.getName(), args[0]);
-        if (!this.kitManager.getKits().containsKey(key)) {
-            sender.sendMessage("There is no such kit");
-            return true;
-        }
-        this.kitManager.getKits().remove(key);
         return true;
     }
 }
